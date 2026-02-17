@@ -15,9 +15,29 @@ import {
   Zap,
   Shield,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { CreateTenantDialog } from './components/CreateTenantDialog';
+
+export interface ServicePlan {
+  id: number;
+  name: string;
+  tier: string;
+  description: string;
+  price_monthly: string;
+  price_yearly: string;
+  trial_days: number;
+  max_menu_items: number;
+  max_staff_users: number;
+  max_customers: number;
+  max_orders_per_month: number;
+  has_inventory_management: boolean;
+  has_delivery_tracking: boolean;
+  has_customer_app: boolean;
+  has_analytics: boolean;
+  has_whatsapp_notifications: boolean;
+  has_multi_branch: boolean;
+}
 
 // Animation variants
 const fadeInUp = {
@@ -642,44 +662,36 @@ function DetailSection({
 }
 
 // Pricing Section
-function PricingSection({ onRegister }: { onRegister: () => void }) {
-  const plans = [
-    {
-      name: 'Starter',
-      price: 'Free',
-      period: '',
-      description: 'Perfect for getting started with a small customer base.',
-      features: [
-        'Up to 50 customers',
-        'Manual payment tracking',
-        'Basic menu management',
-        'Email support',
-        '15-day free trial',
-      ],
-      cta: 'Start Free',
-      popular: false,
-    },
-    {
-      name: 'Pro',
-      price: 'AED 499',
-      period: '/mo',
-      description: 'For established kitchens ready to scale their operations.',
-      features: [
-        'Unlimited customers',
-        'WhatsApp automation',
-        'Dedicated Customer App',
-        'Automated invoicing',
-        'Priority support',
-        'Advanced analytics',
-      ],
-      cta: 'Get Started',
-      popular: true,
-    },
-  ];
+function PricingSection({ onRegister, plans }: { onRegister: () => void; plans: ServicePlan[] }) {
+  const getPlanFeatures = (plan: ServicePlan) => {
+    const list: string[] = [];
+
+    // Usage limits
+    if (plan.max_customers === 0) list.push('Unlimited customers');
+    else if (plan.max_customers > 0) list.push(`Up to ${plan.max_customers.toLocaleString()} customers`);
+
+    // Feature flags
+    if (plan.has_whatsapp_notifications) list.push('WhatsApp automation');
+    if (plan.has_customer_app) list.push('Dedicated Customer App');
+    if (plan.has_inventory_management) list.push('Inventory management');
+    if (plan.has_delivery_tracking) list.push('Delivery tracking');
+    if (plan.has_analytics) list.push('Advanced analytics');
+    if (plan.has_multi_branch) list.push('Multi-branch support');
+
+    // Fallback if no specific features enabled
+    if (list.length < 3) {
+      if (plan.max_menu_items > 0) list.push(`${plan.max_menu_items} menu items`);
+      if (plan.max_staff_users > 0) list.push(`${plan.max_staff_users} staff users`);
+    }
+
+    if (plan.trial_days > 0) list.push(`${plan.trial_days}-day free trial`);
+
+    return list;
+  };
 
   return (
     <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -706,76 +718,81 @@ function PricingSection({ onRegister }: { onRegister: () => void }) {
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
           variants={staggerContainer}
-          className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto"
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center"
         >
-          {plans.map((plan, index) => (
-            <motion.div
-              key={index}
-              variants={fadeInUp}
-              className={`relative p-8 rounded-2xl ${plan.popular
-                ? 'bg-gradient-to-br from-indigo-600 to-violet-700 text-white shadow-2xl shadow-indigo-500/30 scale-105'
-                : 'bg-white border border-slate-200'
-                }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 text-sm font-bold px-4 py-1.5 rounded-full">
-                  Most Popular
-                </div>
-              )}
+          {plans.map((plan, index) => {
+            const isPopular = plan.tier === 'pro' || plan.tier === 'professional';
+            const features = getPlanFeatures(plan);
 
-              <div className="mb-6">
-                <h3
-                  className={`text-xl font-bold mb-2 ${plan.popular ? 'text-white' : 'text-slate-900'}`}
-                >
-                  {plan.name}
-                </h3>
-                <div className="flex items-baseline gap-1">
-                  <span
-                    className={`text-4xl font-bold ${plan.popular ? 'text-white' : 'text-slate-900'}`}
-                  >
-                    {plan.price}
-                  </span>
-                  {plan.period && (
-                    <span
-                      className={plan.popular ? 'text-indigo-200' : 'text-slate-500'}
-                    >
-                      {plan.period}
-                    </span>
-                  )}
-                </div>
-                <p
-                  className={`mt-2 text-sm ${plan.popular ? 'text-indigo-200' : 'text-slate-600'}`}
-                >
-                  {plan.description}
-                </p>
-              </div>
-
-              <ul className="space-y-3 mb-8">
-                {plan.features.map((feature, featureIndex) => (
-                  <li key={featureIndex} className="flex items-start gap-3">
-                    <CheckCircle
-                      className={`w-5 h-5 mt-0.5 flex-shrink-0 ${plan.popular ? 'text-indigo-200' : 'text-indigo-600'}`}
-                    />
-                    <span
-                      className={`text-sm ${plan.popular ? 'text-white' : 'text-slate-700'}`}
-                    >
-                      {feature}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                onClick={onRegister}
-                className={`block w-full py-3 px-6 rounded-xl font-semibold text-center transition-all ${plan.popular
-                  ? 'bg-white text-indigo-600 hover:bg-indigo-50 shadow-lg'
-                  : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/25'
+            return (
+              <motion.div
+                key={plan.id}
+                variants={fadeInUp}
+                className={`relative p-8 rounded-2xl flex flex-col ${isPopular
+                  ? 'bg-gradient-to-br from-indigo-600 to-violet-700 text-white shadow-2xl shadow-indigo-500/30 lg:scale-105 z-10'
+                  : 'bg-white border border-slate-200 shadow-xl shadow-slate-200/50'
                   }`}
               >
-                {plan.cta}
-              </button>
-            </motion.div>
-          ))}
+                {isPopular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 text-sm font-bold px-4 py-1.5 rounded-full">
+                    Most Popular
+                  </div>
+                )}
+
+                <div className="mb-6">
+                  <h3
+                    className={`text-xl font-bold mb-2 ${isPopular ? 'text-white' : 'text-slate-900'}`}
+                  >
+                    {plan.name}
+                  </h3>
+                  <div className="flex items-baseline gap-1">
+                    <span
+                      className={`text-4xl font-bold ${isPopular ? 'text-white' : 'text-slate-900'}`}
+                    >
+                      {parseFloat(plan.price_monthly) === 0 ? 'Free' : `AED ${parseFloat(plan.price_monthly).toLocaleString()}`}
+                    </span>
+                    {parseFloat(plan.price_monthly) > 0 && (
+                      <span
+                        className={isPopular ? 'text-indigo-200' : 'text-slate-500'}
+                      >
+                        /mo
+                      </span>
+                    )}
+                  </div>
+                  <p
+                    className={`mt-4 text-sm leading-relaxed ${isPopular ? 'text-indigo-100' : 'text-slate-600'}`}
+                  >
+                    {plan.description}
+                  </p>
+                </div>
+
+                <ul className="space-y-4 mb-8 flex-1">
+                  {features.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-start gap-3">
+                      <CheckCircle
+                        className={`w-5 h-5 mt-0.5 flex-shrink-0 ${isPopular ? 'text-indigo-300' : 'text-indigo-600'}`}
+                      />
+                      <span
+                        className={`text-sm ${isPopular ? 'text-white' : 'text-slate-700'}`}
+                      >
+                        {feature}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <button
+                  onClick={onRegister}
+                  className={`block w-full py-4 px-6 rounded-xl font-bold text-center transition-all duration-300 ${isPopular
+                    ? 'bg-white text-indigo-600 hover:bg-indigo-50 shadow-lg hover:scale-[1.02]'
+                    : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/25 hover:scale-[1.02]'
+                    }`}
+                >
+                  {parseFloat(plan.price_monthly) === 0 ? 'Start Free' : 'Get Started'}
+                </button>
+              </motion.div>
+            );
+          })}
         </motion.div>
       </div>
     </section>
@@ -831,6 +848,29 @@ function Footer() {
 // Main App Component
 export default function App() {
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+  const [plans, setPlans] = useState<ServicePlan[]>([]);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(false);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      setIsLoadingPlans(true);
+      try {
+        const base = import.meta.env?.VITE_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api-kitchen.funadventure.ae';
+        const url = `${base.replace(/\/$/, '')}/api/organizations/plans/`;
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          const plansList = Array.isArray(data) ? data : (data.results && Array.isArray(data.results) ? data.results : []);
+          setPlans(plansList);
+        }
+      } catch (err) {
+        console.error('Failed to fetch plans:', err);
+      } finally {
+        setIsLoadingPlans(false);
+      }
+    };
+    fetchPlans();
+  }, []);
 
   const openRegistration = () => setIsRegistrationOpen(true);
 
@@ -840,7 +880,7 @@ export default function App() {
       <HeroSection onRegister={openRegistration} />
 
       <EcosystemSection />
-
+      {/* ... detail sections ... */}
       <DetailSection
         title="Powerful Business Dashboard"
         description="The central hub for managing everything from orders to delivery. Get real-time insights into your kitchen's performance."
@@ -893,7 +933,7 @@ export default function App() {
       <PainPointsSection />
       <FeaturesSection />
       <SocialProofSection />
-      <PricingSection onRegister={openRegistration} />
+      <PricingSection onRegister={openRegistration} plans={plans} />
       <Footer />
 
       <CreateTenantDialog
