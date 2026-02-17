@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 
 const SEO = () => {
-    const schemaData = {
+    const foodEstablishmentSchema = {
         "@context": "https://schema.org",
         "@type": "FoodEstablishment",
         "@id": "https://kitchen.funadventure.ae",
@@ -14,14 +14,13 @@ const SEO = () => {
             "name": "Fun Adventure",
             "url": "https://funadventure.ae"
         },
-        // This defines your reach beyond just one city
         "areaServed": [
             { "@type": "City", "name": "Sharjah" },
             { "@type": "City", "name": "Dubai" },
             { "@type": "City", "name": "Abu Dhabi" },
             { "@type": "City", "name": "Ajman" },
             { "@type": "Country", "name": "United Arab Emirates" },
-            { "@type": "Country", "name": "Saudi Arabia" } // For GCC expansion
+            { "@type": "Country", "name": "Saudi Arabia" }
         ],
         "hasOfferCatalog": {
             "@type": "OfferCatalog",
@@ -38,15 +37,26 @@ const SEO = () => {
         }
     };
 
+    const softwareApplicationSchema = {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Fun Adventure Kitchen SaaS",
+        "operatingSystem": "Web",
+        "applicationCategory": "BusinessApplication",
+        "description": "Multi-tenant food business platform for UAE cloud kitchens."
+    };
+
+    const schemaData = [foodEstablishmentSchema, softwareApplicationSchema];
+
     return (
         <Helmet>
-            {/* Broadened Keywords for UAE-wide reach */}
-            <title>Best Meal Prep & Healthy Food Delivery UAE | Fun Adventure Kitchen</title>
-            <meta name="description" content="Customizable healthy meal plans delivered across Dubai, Sharjah, and Abu Dhabi. Start your subscription today with Fun Adventure Kitchen." />
+            <title>Kitchen Management Software UAE | Multi-Tenant Platform</title>
+            <meta name="description" content="The leading cloud kitchen SaaS subscription in the UAE. Manage tenants, delivery, and operations with our multi-tenant food business platform in the UAE." />
+            <meta name="keywords" content="kitchen management software UAE, cloud kitchen SaaS UAE, delivery management system" />
 
-            {/* Open Graph for Social Media (Crucial for UAE/GCC marketing) */}
-            <meta property="og:title" content="Healthy Meal Plans for the UAE & GCC" />
-            <meta property="og:description" content="Premium subscriptions for busy professionals and students." />
+            {/* Open Graph for Social Media */}
+            <meta property="og:title" content="Kitchen Management Software UAE | Multi-Tenant Platform" />
+            <meta property="og:description" content="The leading cloud kitchen SaaS subscription in the UAE. Manage tenants, delivery, and operations." />
             <meta property="og:image" content="https://kitchen.funadventure.ae/assets/og-image.jpg" />
 
             <script type="application/ld+json">
