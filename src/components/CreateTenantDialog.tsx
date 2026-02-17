@@ -76,10 +76,14 @@ export function CreateTenantDialog({ open, onOpenChange }: CreateTenantDialogPro
                     if (res.ok) {
                         const data = await res.json();
                         console.log('Plans data received:', data);
-                        if (Array.isArray(data)) {
-                            setPlans(data);
+
+                        // Handle both simple array and paginated DRF response
+                        const plansList = Array.isArray(data) ? data : (data.results && Array.isArray(data.results) ? data.results : []);
+
+                        if (plansList.length > 0 || Array.isArray(data)) {
+                            setPlans(plansList);
                         } else {
-                            console.error('API returned non-array data for plans:', data);
+                            console.error('API returned unexpected format for plans:', data);
                         }
                     } else {
                         const errorText = await res.text();
