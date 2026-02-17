@@ -1,6 +1,22 @@
 import { Helmet } from 'react-helmet';
 
-const SEO = () => {
+interface SEOProps {
+    title?: string;
+    description?: string;
+    keywords?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+}
+
+const SEO = ({
+    title = "Kitchen Management Software UAE | Multi-Tenant Platform",
+    description = "The leading cloud kitchen SaaS subscription in the UAE. Manage tenants, delivery, and operations with our multi-tenant food business platform in the UAE.",
+    keywords = "kitchen management software UAE, cloud kitchen SaaS UAE, delivery management system",
+    ogTitle,
+    ogDescription,
+    ogImage = "https://kitchen.funadventure.ae/assets/og-image.jpg"
+}: SEOProps) => {
     const foodEstablishmentSchema = {
         "@context": "https://schema.org",
         "@type": "FoodEstablishment",
@@ -50,14 +66,14 @@ const SEO = () => {
 
     return (
         <Helmet>
-            <title>Kitchen Management Software UAE | Multi-Tenant Platform</title>
-            <meta name="description" content="The leading cloud kitchen SaaS subscription in the UAE. Manage tenants, delivery, and operations with our multi-tenant food business platform in the UAE." />
-            <meta name="keywords" content="kitchen management software UAE, cloud kitchen SaaS UAE, delivery management system" />
+            <title>{title}</title>
+            <meta name="description" content={description} />
+            <meta name="keywords" content={keywords} />
 
             {/* Open Graph for Social Media */}
-            <meta property="og:title" content="Kitchen Management Software UAE | Multi-Tenant Platform" />
-            <meta property="og:description" content="The leading cloud kitchen SaaS subscription in the UAE. Manage tenants, delivery, and operations." />
-            <meta property="og:image" content="https://kitchen.funadventure.ae/assets/og-image.jpg" />
+            <meta property="og:title" content={ogTitle || title} />
+            <meta property="og:description" content={ogDescription || description} />
+            <meta property="og:image" content={ogImage} />
 
             <script type="application/ld+json">
                 {JSON.stringify(schemaData)}

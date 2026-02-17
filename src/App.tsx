@@ -1,4 +1,6 @@
 import { motion } from 'framer-motion';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 import {
   ChefHat,
   Calendar,
@@ -921,11 +923,10 @@ export default function App() {
 
   const openRegistration = () => setIsRegistrationOpen(true);
 
-  return (
+  const LandingPage = ({ seoProps }: { seoProps?: any }) => (
     <main className="min-h-screen bg-white scroll-smooth">
-      <SEO />
+      <SEO {...seoProps} />
       <Navbar onRegister={openRegistration} />
-
       <HeroSection onRegister={openRegistration} />
 
       <EcosystemSection />
@@ -991,4 +992,37 @@ export default function App() {
       />
     </main>
   );
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route
+          path="/features"
+          element={
+            <LandingPage
+              seoProps={{
+                title: "Kitchen Automation Features | UAE SaaS Platform",
+                description: "Streamline your UAE food business with automated order management, sales insights, and supply chain tracking in one B2B SaaS dashboard. Start today."
+              }}
+            />
+          }
+        />
+        <Route
+          path="/pricing"
+          element={
+            <LandingPage
+              seoProps={{
+                title: "Transparent SaaS Pricing | Kitchen Software UAE",
+                description: "Flexible tiered and usage-based pricing for UAE cloud kitchens. Scale your food brand with no hidden costs and 100% space utilization. See our plans."
+              }}
+            />
+          }
+        />
+        {/* Fallback for other routes defined in sitemap */}
+        <Route path="/contact" element={<LandingPage />} />
+      </Routes>
+    </Router>
+  );
 }
+
