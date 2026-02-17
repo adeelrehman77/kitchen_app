@@ -1,0 +1,25 @@
+# Robot.txt for kitchen.funadventure.ae (UAE SaaS Platform)
+User-agent: *
+
+# Allow Google to crawl your B2B Landing Pages
+Allow: /
+Allow: /about
+Allow: /features
+Allow: /pricing
+Allow: /contact
+
+# Block sensitive system and tenant-specific paths
+Disallow: /admin/
+Disallow: /api/v1/internal/
+Disallow: /static/admin/
+Disallow: /media/private/
+Disallow: /config/
+Disallow: /*/settings/
+
+# Block crawlers from getting stuck in search filters or login redirects
+Disallow: /login
+Disallow: /register
+Disallow: /search?q=
+
+# Point to your sitemap to help Google index UAE-wide content
+Sitemap: https://kitchen.funadventure.ae/sitemap.xml
