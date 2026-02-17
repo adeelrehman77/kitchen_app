@@ -758,21 +758,18 @@ interface LandingPageProps {
   setIsRegistrationOpen: (open: boolean) => void;
 }
 
-const LandingPage = ({
-  seoProps,
+const LandingPageContent = ({
   plans,
   isLoadingPlans,
   onRegister,
-  isRegistrationOpen,
-  setIsRegistrationOpen
-}: LandingPageProps) => (
-  <main className="min-h-screen bg-white scroll-smooth">
-    <SEO {...seoProps} />
-    <Navbar onRegister={onRegister} />
+}: {
+  plans: ServicePlan[];
+  isLoadingPlans: boolean;
+  onRegister: () => void;
+}) => (
+  <>
     <HeroSection onRegister={onRegister} />
-
     <EcosystemSection />
-
     <DetailSection
       title="Powerful Business Dashboard"
       description="The central hub for managing everything from orders to delivery. Get real-time insights into your kitchen's performance."
@@ -788,7 +785,6 @@ const LandingPage = ({
       imageAlt="Business Dashboard Interface"
       cta={{ text: "Book a Demo", link: "#", type: "primary" }}
     />
-
     <DetailSection
       title="The Customer App"
       description="A user-friendly mobile app for your customers to manage their subscriptions, skip meals, and track deliveries in real-time."
@@ -805,7 +801,6 @@ const LandingPage = ({
       isReversed
       cta={{ text: "Learn More", link: "#", type: "outline" }}
     />
-
     <DetailSection
       title="The Driver's Field App"
       description="Efficiently manage last-mile deliveries. Drivers get optimized routes and customers get real-time tracking updates."
@@ -821,19 +816,13 @@ const LandingPage = ({
       imageAlt="Driver Field App"
       cta={{ text: "Talk to Us!", link: "#", type: "primary" }}
     />
-
     <PainPointsSection />
     <FeaturesSection />
     <SocialProofSection />
     <PricingSection onRegister={onRegister} plans={plans} isLoading={isLoadingPlans} />
-    <Footer />
-
-    <CreateTenantDialog
-      open={isRegistrationOpen}
-      onOpenChange={setIsRegistrationOpen}
-    />
-  </main>
+  </>
 );
+
 
 // Main App Component
 export default function App() {
@@ -874,38 +863,68 @@ export default function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage {...landingPageProps} />} />
-        <Route
-          path="/features"
-          element={
-            <LandingPage
-              {...landingPageProps}
-              seoProps={{
-                title: "Kitchen Automation Features | UAE SaaS Platform",
-                description: "Streamline your UAE food business with automated order management, sales insights, and supply chain tracking in one B2B SaaS dashboard. Start today."
-              }}
+      <div className="min-h-screen bg-white flex flex-col">
+        <Navbar onRegister={openRegistration} />
+
+        <main className="flex-grow scroll-smooth">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <>
+                  <SEO />
+                  <LandingPageContent {...landingPageProps} onRegister={openRegistration} />
+                </>
+              }
             />
-          }
-        />
-        <Route
-          path="/pricing"
-          element={
-            <LandingPage
-              {...landingPageProps}
-              seoProps={{
-                title: "Transparent SaaS Pricing | Kitchen Software UAE",
-                description: "Flexible tiered and usage-based pricing for UAE cloud kitchens. Scale your food brand with no hidden costs and 100% space utilization. See our plans."
-              }}
+            <Route
+              path="/features"
+              element={
+                <>
+                  <SEO
+                    title="Kitchen Automation Features | UAE SaaS Platform"
+                    description="Streamline your UAE food business with automated order management, sales insights, and supply chain tracking in one B2B SaaS dashboard. Start today."
+                  />
+                  <LandingPageContent {...landingPageProps} onRegister={openRegistration} />
+                </>
+              }
             />
-          }
+            <Route
+              path="/pricing"
+              element={
+                <>
+                  <SEO
+                    title="Transparent SaaS Pricing | Kitchen Software UAE"
+                    description="Flexible tiered and usage-based pricing for UAE cloud kitchens. Scale your food brand with no hidden costs and 100% space utilization. See our plans."
+                  />
+                  <LandingPageContent {...landingPageProps} onRegister={openRegistration} />
+                </>
+              }
+            />
+            <Route
+              path="/contact"
+              element={
+                <>
+                  <SEO />
+                  <LandingPageContent {...landingPageProps} onRegister={openRegistration} />
+                </>
+              }
+            />
+            <Route path="/privacy" element={<PrivacyPolicy onRegister={openRegistration} />} />
+            <Route path="/terms" element={<TermsOfService onRegister={openRegistration} />} />
+          </Routes>
+        </main>
+
+        <Footer />
+
+        <CreateTenantDialog
+          open={isRegistrationOpen}
+          onOpenChange={setIsRegistrationOpen}
         />
-        <Route path="/contact" element={<LandingPage {...landingPageProps} />} />
-        <Route path="/privacy" element={<PrivacyPolicy onRegister={openRegistration} />} />
-        <Route path="/terms" element={<TermsOfService onRegister={openRegistration} />} />
-      </Routes>
+      </div>
     </Router>
   );
 }
+
 
 

@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
-
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 interface NavbarProps {
     onRegister: () => void;
@@ -10,6 +9,46 @@ interface NavbarProps {
 
 export function Navbar({ onRegister }: NavbarProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const location = useLocation();
+
+    // Smooth scroll for hash links
+    useEffect(() => {
+        if (location.hash) {
+            const id = location.hash.replace('#', '');
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }, [location]);
+
+    const NavLink = ({ to, children }: { to: string; children: React.ReactNode }) => {
+        const isHash = to.startsWith('/#');
+        const isActive = location.pathname + location.hash === to || (to === '/#features' && location.pathname === '/features');
+
+        if (isHash && location.pathname === '/') {
+            return (
+                <a
+                    href={to.replace('/', '')}
+                    className={`transition-all duration-300 font-medium hover:text-indigo-600 ${isActive ? 'text-indigo-600' : 'text-slate-600'
+                        }`}
+                >
+                    {children}
+                </a>
+            );
+        }
+
+        return (
+            <Link
+                to={to}
+                className={`transition-all duration-300 font-medium hover:text-indigo-600 ${isActive ? 'text-indigo-600' : 'text-slate-600'
+                    }`}
+                onClick={() => setIsOpen(false)}
+            >
+                {children}
+            </Link>
+        );
+    };
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200">
@@ -27,28 +66,11 @@ export function Navbar({ onRegister }: NavbarProps) {
                         </span>
                     </Link>
 
-
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center gap-8">
-                        <Link
-                            to="/#features"
-                            className="text-slate-600 hover:text-indigo-600 transition-colors font-medium"
-                        >
-                            Features
-                        </Link>
-                        <Link
-                            to="/#pricing"
-                            className="text-slate-600 hover:text-indigo-600 transition-colors font-medium"
-                        >
-                            Pricing
-                        </Link>
-                        <Link
-                            to="/#testimonials"
-                            className="text-slate-600 hover:text-indigo-600 transition-colors font-medium"
-                        >
-                            Testimonials
-                        </Link>
-
+                        <NavLink to="/#features">Features</NavLink>
+                        <NavLink to="/#pricing">Pricing</NavLink>
+                        <NavLink to="/#testimonials">Testimonials</NavLink>
                     </div>
 
                     {/* CTA Buttons */}
@@ -90,16 +112,9 @@ export function Navbar({ onRegister }: NavbarProps) {
                     className="md:hidden bg-white border-b border-slate-200 px-4 py-4"
                 >
                     <div className="flex flex-col gap-4">
-                        <Link to="/#features" className="text-slate-600 font-medium py-2" onClick={() => setIsOpen(false)}>
-                            Features
-                        </Link>
-                        <Link to="/#pricing" className="text-slate-600 font-medium py-2" onClick={() => setIsOpen(false)}>
-                            Pricing
-                        </Link>
-                        <Link to="/#testimonials" className="text-slate-600 font-medium py-2" onClick={() => setIsOpen(false)}>
-                            Testimonials
-                        </Link>
-
+                        <NavLink to="/#features">Features</NavLink>
+                        <NavLink to="/#pricing">Pricing</NavLink>
+                        <NavLink to="/#testimonials">Testimonials</NavLink>
                         <a
                             href="https://kitchenapp.funadventure.ae"
                             className="text-slate-600 font-medium py-2"
