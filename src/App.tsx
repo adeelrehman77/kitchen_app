@@ -539,18 +539,18 @@ function EcosystemSection() {
         </motion.div>
       </div>
 
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-100 bg-white p-8 sm:p-12"
+          className="relative rounded-3xl overflow-hidden shadow-xl border border-slate-100 bg-white p-6 sm:p-8"
         >
           <img
             src="/assets/ecosystem.png"
             alt="Kitchen Ecosystem Flow"
-            className="w-full h-auto object-contain"
+            className="w-full max-h-[450px] object-contain mx-auto"
           />
         </motion.div>
       </div>
