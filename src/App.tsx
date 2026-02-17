@@ -661,8 +661,51 @@ function DetailSection({
   );
 }
 
+const DEFAULT_PLANS: ServicePlan[] = [
+  {
+    id: -1,
+    name: 'Starter',
+    tier: 'free',
+    description: 'Perfect for getting started with a small customer base.',
+    price_monthly: '0.00',
+    price_yearly: '0.00',
+    trial_days: 15,
+    max_customers: 50,
+    max_menu_items: 20,
+    max_staff_users: 2,
+    max_orders_per_month: 500,
+    has_inventory_management: false,
+    has_delivery_tracking: false,
+    has_customer_app: false,
+    has_analytics: false,
+    has_whatsapp_notifications: false,
+    has_multi_branch: false,
+  },
+  {
+    id: -2,
+    name: 'Pro',
+    tier: 'pro',
+    description: 'For established kitchens ready to scale their operations.',
+    price_monthly: '499.00',
+    price_yearly: '4990.00',
+    trial_days: 14,
+    max_customers: 0,
+    max_menu_items: 0,
+    max_staff_users: 10,
+    max_orders_per_month: 0,
+    has_inventory_management: true,
+    has_delivery_tracking: true,
+    has_customer_app: true,
+    has_analytics: true,
+    has_whatsapp_notifications: true,
+    has_multi_branch: false,
+  }
+];
+
 // Pricing Section
-function PricingSection({ onRegister, plans }: { onRegister: () => void; plans: ServicePlan[] }) {
+function PricingSection({ onRegister, plans, isLoading }: { onRegister: () => void; plans: ServicePlan[]; isLoading: boolean }) {
+  const displayPlans = plans.length > 0 ? plans : DEFAULT_PLANS;
+
   const getPlanFeatures = (plan: ServicePlan) => {
     const list: string[] = [];
 
@@ -681,6 +724,8 @@ function PricingSection({ onRegister, plans }: { onRegister: () => void; plans: 
     // Fallback if no specific features enabled
     if (list.length < 3) {
       if (plan.max_menu_items > 0) list.push(`${plan.max_menu_items} menu items`);
+      else if (plan.max_menu_items === 0) list.push('Unlimited menu items');
+
       if (plan.max_staff_users > 0) list.push(`${plan.max_staff_users} staff users`);
     }
 
@@ -707,9 +752,9 @@ function PricingSection({ onRegister, plans }: { onRegister: () => void; plans: 
           </motion.h2>
           <motion.p
             variants={fadeInUp}
-            className="text-lg text-slate-600 max-w-2xl mx-auto"
+            className={`text-lg text-slate-600 max-w-2xl mx-auto transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}
           >
-            Start free and upgrade as you grow. No hidden fees, no surprises.
+            {isLoading ? 'Updating latest plans...' : 'Start free and upgrade as you grow. No hidden fees, no surprises.'}
           </motion.p>
         </motion.div>
 
@@ -720,15 +765,15 @@ function PricingSection({ onRegister, plans }: { onRegister: () => void; plans: 
           variants={staggerContainer}
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center"
         >
-          {plans.map((plan, index) => {
-            const isPopular = plan.tier === 'pro' || plan.tier === 'professional';
+          {displayPlans.map((plan) => {
+            const isPopular = plan.tier === 'pro' || plan.tier === 'professional' || plan.name.toLowerCase().includes('pro');
             const features = getPlanFeatures(plan);
 
             return (
               <motion.div
                 key={plan.id}
                 variants={fadeInUp}
-                className={`relative p-8 rounded-2xl flex flex-col ${isPopular
+                className={`relative p-8 rounded-2xl flex flex-col transition-all duration-300 ${isPopular
                   ? 'bg-gradient-to-br from-indigo-600 to-violet-700 text-white shadow-2xl shadow-indigo-500/30 lg:scale-105 z-10'
                   : 'bg-white border border-slate-200 shadow-xl shadow-slate-200/50'
                   }`}
@@ -880,7 +925,7 @@ export default function App() {
       <HeroSection onRegister={openRegistration} />
 
       <EcosystemSection />
-      {/* ... detail sections ... */}
+
       <DetailSection
         title="Powerful Business Dashboard"
         description="The central hub for managing everything from orders to delivery. Get real-time insights into your kitchen's performance."
@@ -933,7 +978,7 @@ export default function App() {
       <PainPointsSection />
       <FeaturesSection />
       <SocialProofSection />
-      <PricingSection onRegister={openRegistration} plans={plans} />
+      <PricingSection onRegister={openRegistration} plans={plans} isLoading={isLoadingPlans} />
       <Footer />
 
       <CreateTenantDialog
