@@ -1,0 +1,7 @@
+#:schema https://raw.githubusercontent.com/cloudflare/wrangler2/sys-config-schema/packages/wrangler/config-schema.json
+name = "kitchen-app"
+pages_build_output_dir = "./dist"
+
+[vars]
+VITE_API_URL = "https://api-kitchen.funadventure.ae"
+NEXT_PUBLIC_API_URL = "https://api-kitchen.funadventure.ae"
