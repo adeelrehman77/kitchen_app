@@ -72,7 +72,11 @@ export function CreateTenantDialog({ open, onOpenChange }: CreateTenantDialogPro
                     const res = await fetch(`${base.replace(/\/$/, '')}/api/organizations/plans/`);
                     if (res.ok) {
                         const data = await res.json();
-                        setPlans(data);
+                        if (Array.isArray(data)) {
+                            setPlans(data);
+                        } else {
+                            console.error('API returned non-array data for plans:', data);
+                        }
                     }
                 } catch (err) {
                     console.error('Failed to fetch plans:', err);
@@ -248,7 +252,7 @@ export function CreateTenantDialog({ open, onOpenChange }: CreateTenantDialogPro
                                                             disabled={isLoadingPlans}
                                                         >
                                                             <option value="none">No Plan (assign later)</option>
-                                                            {plans.map((p) => (
+                                                            {Array.isArray(plans) && plans.map((p) => (
                                                                 <option key={p.id} value={p.id}>
                                                                     {p.name} ({p.price_monthly === "0.00" ? 'Free' : `AED ${parseFloat(p.price_monthly).toLocaleString()}/mo`})
                                                                 </option>
