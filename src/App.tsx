@@ -18,6 +18,8 @@ import {
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { CreateTenantDialog } from './components/CreateTenantDialog';
+import SEO from './components/SEO';
+
 
 export interface ServicePlan {
   id: number;
@@ -921,7 +923,9 @@ export default function App() {
 
   return (
     <main className="min-h-screen bg-white scroll-smooth">
+      <SEO />
       <Navbar onRegister={openRegistration} />
+
       <HeroSection onRegister={openRegistration} />
 
       <EcosystemSection />
