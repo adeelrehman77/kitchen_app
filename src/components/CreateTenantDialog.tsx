@@ -69,14 +69,21 @@ export function CreateTenantDialog({ open, onOpenChange }: CreateTenantDialogPro
                 setIsLoadingPlans(true);
                 try {
                     const base = import.meta.env?.VITE_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api-kitchen.funadventure.ae';
-                    const res = await fetch(`${base.replace(/\/$/, '')}/api/organizations/plans/`);
+                    const url = `${base.replace(/\/$/, '')}/api/organizations/plans/`;
+                    console.log('Fetching plans from:', url);
+                    const res = await fetch(url);
+                    console.log('Plans response status:', res.status);
                     if (res.ok) {
                         const data = await res.json();
+                        console.log('Plans data received:', data);
                         if (Array.isArray(data)) {
                             setPlans(data);
                         } else {
                             console.error('API returned non-array data for plans:', data);
                         }
+                    } else {
+                        const errorText = await res.text();
+                        console.error('Plans fetch failed:', errorText);
                     }
                 } catch (err) {
                     console.error('Failed to fetch plans:', err);
