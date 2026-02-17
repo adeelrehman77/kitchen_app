@@ -37,11 +37,14 @@ const registrationSchema = z.object({
 type RegistrationForm = z.infer<typeof registrationSchema>;
 
 // Map form plan values to backend plan_id (update IDs to match your ServicePlan records)
-const PLAN_IDS: Record<string, number | null> = {
-    none: null,
-    starter: 1,  // Update to your Starter plan ID
-    pro: 2,      // Update to your Pro plan ID
-};
+interface ServicePlan {
+    id: number;
+    name: string;
+    tier: string;
+    description: string;
+    price_monthly: string;
+    trial_days: number;
+}
 
 const getRegisterUrl = () => {
     const base = import.meta.env?.VITE_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api-kitchen.funadventure.ae';
@@ -57,6 +60,29 @@ export function CreateTenantDialog({ open, onOpenChange }: CreateTenantDialogPro
     const [isSubmitting, setIsSubmitting] = React.useState(false);
     const [isSuccess, setIsSuccess] = React.useState(false);
     const [apiError, setApiError] = React.useState<string | null>(null);
+    const [plans, setPlans] = React.useState<ServicePlan[]>([]);
+    const [isLoadingPlans, setIsLoadingPlans] = React.useState(false);
+
+    React.useEffect(() => {
+        if (open) {
+            const fetchPlans = async () => {
+                setIsLoadingPlans(true);
+                try {
+                    const base = import.meta.env?.VITE_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api-kitchen.funadventure.ae';
+                    const res = await fetch(`${base.replace(/\/$/, '')}/api/organizations/plans/`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        setPlans(data);
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch plans:', err);
+                } finally {
+                    setIsLoadingPlans(false);
+                }
+            };
+            fetchPlans();
+        }
+    }, [open]);
 
     const {
         register,
@@ -79,7 +105,7 @@ export function CreateTenantDialog({ open, onOpenChange }: CreateTenantDialogPro
             subdomain: data.subdomain.trim().toLowerCase(),
             admin_email: data.adminEmail.trim(),
             admin_password: data.adminPassword,
-            ...(PLAN_IDS[data.plan] && { plan_id: PLAN_IDS[data.plan] }),
+            ...(data.plan !== 'none' && { plan_id: parseInt(data.plan) }),
         };
 
         try {
@@ -218,11 +244,15 @@ export function CreateTenantDialog({ open, onOpenChange }: CreateTenantDialogPro
                                                         </div>
                                                         <select
                                                             {...register('plan')}
-                                                            className="w-full bg-white border-2 border-slate-200 rounded-2xl py-4 pl-12 pr-10 text-slate-800 appearance-none focus:border-indigo-600 outline-none transition-all cursor-pointer font-medium"
+                                                            className="w-full bg-white border-2 border-slate-200 rounded-2xl py-4 pl-12 pr-10 text-slate-800 appearance-none focus:border-indigo-600 outline-none transition-all cursor-pointer font-medium disabled:opacity-50"
+                                                            disabled={isLoadingPlans}
                                                         >
                                                             <option value="none">No Plan (assign later)</option>
-                                                            <option value="starter">Starter Plan (Free)</option>
-                                                            <option value="pro">Pro Plan (AED 499/mo)</option>
+                                                            {plans.map((p) => (
+                                                                <option key={p.id} value={p.id}>
+                                                                    {p.name} ({p.price_monthly === "0.00" ? 'Free' : `AED ${parseFloat(p.price_monthly).toLocaleString()}/mo`})
+                                                                </option>
+                                                            ))}
                                                         </select>
                                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
