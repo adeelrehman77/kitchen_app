@@ -11,16 +11,20 @@ import {
   Users,
   CheckCircle,
   ArrowRight,
-  Menu,
-  X,
-  Sparkles,
   Zap,
   Shield,
+  Sparkles,
 } from 'lucide-react';
+
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { CreateTenantDialog } from './components/CreateTenantDialog';
 import SEO from './components/SEO';
+import { Navbar } from './components/Navbar';
+import { Footer } from './components/Footer';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+
 
 
 export interface ServicePlan {
@@ -56,111 +60,6 @@ const staggerContainer = {
     transition: { staggerChildren: 0.1 },
   },
 };
-
-// Navbar Component
-function Navbar({ onRegister }: { onRegister: () => void }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <ChefHat className="w-8 h-8 text-indigo-600" />
-            <span className="text-xl font-bold text-slate-900">
-              Fun Adventure Kitchen
-            </span>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            <a
-              href="#features"
-              className="text-slate-600 hover:text-indigo-600 transition-colors font-medium"
-            >
-              Features
-            </a>
-            <a
-              href="#pricing"
-              className="text-slate-600 hover:text-indigo-600 transition-colors font-medium"
-            >
-              Pricing
-            </a>
-            <a
-              href="#testimonials"
-              className="text-slate-600 hover:text-indigo-600 transition-colors font-medium"
-            >
-              Testimonials
-            </a>
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="hidden md:flex items-center gap-4">
-            <a
-              href="https://kitchenapp.funadventure.ae"
-              className="text-slate-600 hover:text-indigo-600 transition-colors font-medium"
-            >
-              Login
-            </a>
-            <button
-              onClick={onRegister}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-semibold transition-all shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40"
-            >
-              Start Free Trial
-            </button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
-          >
-            {isOpen ? (
-              <X className="w-6 h-6 text-slate-600" />
-            ) : (
-              <Menu className="w-6 h-6 text-slate-600" />
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="md:hidden bg-white border-b border-slate-200 px-4 py-4"
-        >
-          <div className="flex flex-col gap-4">
-            <a href="#features" className="text-slate-600 font-medium py-2">
-              Features
-            </a>
-            <a href="#pricing" className="text-slate-600 font-medium py-2">
-              Pricing
-            </a>
-            <a href="#testimonials" className="text-slate-600 font-medium py-2">
-              Testimonials
-            </a>
-            <a
-              href="https://kitchenapp.funadventure.ae"
-              className="text-slate-600 font-medium py-2"
-            >
-              Login
-            </a>
-            <button
-              onClick={onRegister}
-              className="bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-semibold text-center"
-            >
-              Start Free Trial
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </nav>
-  );
-}
 
 // Hero Section
 function HeroSection({ onRegister }: { onRegister: () => void }) {
@@ -848,51 +747,7 @@ function PricingSection({ onRegister, plans, isLoading }: { onRegister: () => vo
   );
 }
 
-// Footer
-function Footer() {
-  return (
-    <footer className="bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <ChefHat className="w-6 h-6 text-indigo-400" />
-            <span className="text-lg font-bold text-white">
-              Fun Adventure Kitchen
-            </span>
-          </div>
-
-          {/* Links */}
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            <a
-              href="#"
-              className="text-slate-400 hover:text-white transition-colors text-sm"
-            >
-              Privacy Policy
-            </a>
-            <a
-              href="#"
-              className="text-slate-400 hover:text-white transition-colors text-sm"
-            >
-              Terms of Service
-            </a>
-            <a
-              href="mailto:support@funadventure.ae"
-              className="text-slate-400 hover:text-white transition-colors text-sm"
-            >
-              Contact
-            </a>
-          </div>
-
-          {/* Copyright */}
-          <p className="text-slate-500 text-sm">
-            &copy; 2026 Fun Adventure. All rights reserved.
-          </p>
-        </div>
-      </div>
-    </footer>
-  );
-}
+// Dynamic Section Components
 
 interface LandingPageProps {
   seoProps?: any;
@@ -1045,8 +900,9 @@ export default function App() {
             />
           }
         />
-        {/* Fallback for other routes defined in sitemap */}
         <Route path="/contact" element={<LandingPage {...landingPageProps} />} />
+        <Route path="/privacy" element={<PrivacyPolicy onRegister={openRegistration} />} />
+        <Route path="/terms" element={<TermsOfService onRegister={openRegistration} />} />
       </Routes>
     </Router>
   );
