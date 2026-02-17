@@ -1,5 +1,5 @@
-import { ChefHat } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
 
 export function Footer() {
     return (
@@ -8,7 +8,11 @@ export function Footer() {
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-2">
-                        <ChefHat className="w-6 h-6 text-indigo-400" />
+                        <img
+                            src="/assets/logo.png"
+                            alt="Fun Adventure Kitchen Logo"
+                            className="w-8 h-8 object-contain"
+                        />
                         <span className="text-lg font-bold text-white">
                             Fun Adventure Kitchen
                         </span>

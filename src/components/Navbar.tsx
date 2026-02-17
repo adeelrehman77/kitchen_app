@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChefHat, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+
 import { Link } from 'react-router-dom';
 
 interface NavbarProps {
@@ -16,11 +17,16 @@ export function Navbar({ onRegister }: NavbarProps) {
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-2">
-                        <ChefHat className="w-8 h-8 text-indigo-600" />
+                        <img
+                            src="/assets/logo.png"
+                            alt="Fun Adventure Kitchen Logo"
+                            className="w-10 h-10 object-contain"
+                        />
                         <span className="text-xl font-bold text-slate-900">
                             Fun Adventure Kitchen
                         </span>
                     </Link>
+
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center gap-8">
@@ -36,6 +42,13 @@ export function Navbar({ onRegister }: NavbarProps) {
                         >
                             Pricing
                         </Link>
+                        <Link
+                            to="/#testimonials"
+                            className="text-slate-600 hover:text-indigo-600 transition-colors font-medium"
+                        >
+                            Testimonials
+                        </Link>
+
                     </div>
 
                     {/* CTA Buttons */}
@@ -83,6 +96,10 @@ export function Navbar({ onRegister }: NavbarProps) {
                         <Link to="/#pricing" className="text-slate-600 font-medium py-2" onClick={() => setIsOpen(false)}>
                             Pricing
                         </Link>
+                        <Link to="/#testimonials" className="text-slate-600 font-medium py-2" onClick={() => setIsOpen(false)}>
+                            Testimonials
+                        </Link>
+
                         <a
                             href="https://kitchenapp.funadventure.ae"
                             className="text-slate-600 font-medium py-2"
