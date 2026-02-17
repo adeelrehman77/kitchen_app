@@ -16,6 +16,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 import { CreateTenantDialog } from './components/CreateTenantDialog';
 
 // Animation variants
@@ -517,6 +518,129 @@ function SocialProofSection() {
   );
 }
 
+// Ecosystem Section
+function EcosystemSection() {
+  return (
+    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white overflow-hidden">
+      <div className="max-w-7xl mx-auto text-center mb-16">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+        >
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
+            A Complete Tech Ecosystem for Your Kitchen
+          </h2>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Everything connects seamlessly. One dashboard to rule them all,
+            connected to powerful mobile apps for your customers and drivers.
+          </p>
+        </motion.div>
+      </div>
+
+      <div className="max-w-5xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-100 bg-white p-8 sm:p-12"
+        >
+          <img
+            src="/assets/ecosystem.png"
+            alt="Kitchen Ecosystem Flow"
+            className="w-full h-auto object-contain"
+          />
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+// Detailed Section Components for reuse
+interface FeatureSectionProps {
+  title: string;
+  description: string;
+  features: string[];
+  imageSrc: string;
+  imageAlt: string;
+  isReversed?: boolean;
+  cta?: { text: string; link: string; type?: 'primary' | 'outline' };
+}
+
+function DetailSection({
+  title,
+  description,
+  features,
+  imageSrc,
+  imageAlt,
+  isReversed,
+  cta
+}: FeatureSectionProps) {
+  return (
+    <section className="py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <div className="max-w-7xl mx-auto">
+        <div className={`grid lg:grid-cols-2 gap-16 items-center ${isReversed ? 'lg:flex-row-reverse' : ''}`}>
+          <motion.div
+            initial={{ opacity: 0, x: isReversed ? 40 : -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className={isReversed ? 'lg:order-2' : 'lg:order-1'}
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6 leading-tight">
+              {title}
+            </h2>
+            <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+              {description}
+            </p>
+            <div className="grid sm:grid-cols-2 gap-4 mb-10">
+              {features.map((feature, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+                  <span className="text-slate-700 font-medium">{feature}</span>
+                </div>
+              ))}
+            </div>
+            {cta && (
+              <div className="flex gap-4">
+                <button
+                  className={cn(
+                    "px-6 py-3 rounded-xl font-semibold transition-all",
+                    cta.type === 'outline'
+                      ? "border-2 border-slate-200 text-slate-700 hover:border-indigo-600 hover:text-indigo-600"
+                      : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-600/20"
+                  )}
+                >
+                  {cta.text}
+                </button>
+              </div>
+            )}
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: isReversed ? -40 : 40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className={cn(
+              "relative bg-slate-50 p-8 sm:p-12 rounded-[2.5rem] border border-slate-100",
+              isReversed ? 'lg:order-1' : 'lg:order-2'
+            )}
+          >
+            <img
+              src={imageSrc}
+              alt={imageAlt}
+              className="w-full h-auto drop-shadow-2xl rounded-2xl"
+            />
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // Pricing Section
 function PricingSection({ onRegister }: { onRegister: () => void }) {
   const plans = [
@@ -589,8 +713,8 @@ function PricingSection({ onRegister }: { onRegister: () => void }) {
               key={index}
               variants={fadeInUp}
               className={`relative p-8 rounded-2xl ${plan.popular
-                  ? 'bg-gradient-to-br from-indigo-600 to-violet-700 text-white shadow-2xl shadow-indigo-500/30 scale-105'
-                  : 'bg-white border border-slate-200'
+                ? 'bg-gradient-to-br from-indigo-600 to-violet-700 text-white shadow-2xl shadow-indigo-500/30 scale-105'
+                : 'bg-white border border-slate-200'
                 }`}
             >
               {plan.popular && (
@@ -644,8 +768,8 @@ function PricingSection({ onRegister }: { onRegister: () => void }) {
               <button
                 onClick={onRegister}
                 className={`block w-full py-3 px-6 rounded-xl font-semibold text-center transition-all ${plan.popular
-                    ? 'bg-white text-indigo-600 hover:bg-indigo-50 shadow-lg'
-                    : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/25'
+                  ? 'bg-white text-indigo-600 hover:bg-indigo-50 shadow-lg'
+                  : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/25'
                   }`}
               >
                 {plan.cta}
@@ -714,6 +838,58 @@ export default function App() {
     <main className="min-h-screen bg-white scroll-smooth">
       <Navbar onRegister={openRegistration} />
       <HeroSection onRegister={openRegistration} />
+
+      <EcosystemSection />
+
+      <DetailSection
+        title="Powerful Business Dashboard"
+        description="The central hub for managing everything from orders to delivery. Get real-time insights into your kitchen's performance."
+        features={[
+          "CRM - Leads & Trials",
+          "Subscription & Order Fulfilment",
+          "Custom delivery rules",
+          "Business Analytics & Reports",
+          "Marketing Engagement",
+          "3rd party Integrations"
+        ]}
+        imageSrc="/assets/business-dashboard.png"
+        imageAlt="Business Dashboard Interface"
+        cta={{ text: "Book a Demo", link: "#", type: "primary" }}
+      />
+
+      <DetailSection
+        title="The Customer App"
+        description="A user-friendly mobile app for your customers to manage their subscriptions, skip meals, and track deliveries in real-time."
+        features={[
+          "Clean Modern Design",
+          "Easy Subscription Setup",
+          "Flexible Scheduling",
+          "Order Calendar",
+          "Multiple Payment Options",
+          "Referral Program"
+        ]}
+        imageSrc="/assets/customer-app.png"
+        imageAlt="Customer Mobile App"
+        isReversed
+        cta={{ text: "Learn More", link: "#", type: "outline" }}
+      />
+
+      <DetailSection
+        title="The Driver's Field App"
+        description="Efficiently manage last-mile deliveries. Drivers get optimized routes and customers get real-time tracking updates."
+        features={[
+          "Route Optimization",
+          "Real-Time Order Updates",
+          "Multi-lingual Support",
+          "Offline Mode Support",
+          "Proof of Delivery",
+          "Cash Collection Summary"
+        ]}
+        imageSrc="/assets/driver-app.png"
+        imageAlt="Driver Field App"
+        cta={{ text: "Talk to Us!", link: "#", type: "primary" }}
+      />
+
       <PainPointsSection />
       <FeaturesSection />
       <SocialProofSection />
