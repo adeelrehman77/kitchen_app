@@ -894,6 +894,92 @@ function Footer() {
   );
 }
 
+interface LandingPageProps {
+  seoProps?: any;
+  plans: ServicePlan[];
+  isLoadingPlans: boolean;
+  onRegister: () => void;
+  isRegistrationOpen: boolean;
+  setIsRegistrationOpen: (open: boolean) => void;
+}
+
+const LandingPage = ({
+  seoProps,
+  plans,
+  isLoadingPlans,
+  onRegister,
+  isRegistrationOpen,
+  setIsRegistrationOpen
+}: LandingPageProps) => (
+  <main className="min-h-screen bg-white scroll-smooth">
+    <SEO {...seoProps} />
+    <Navbar onRegister={onRegister} />
+    <HeroSection onRegister={onRegister} />
+
+    <EcosystemSection />
+
+    <DetailSection
+      title="Powerful Business Dashboard"
+      description="The central hub for managing everything from orders to delivery. Get real-time insights into your kitchen's performance."
+      features={[
+        "CRM - Leads & Trials",
+        "Subscription & Order Fulfilment",
+        "Custom delivery rules",
+        "Business Analytics & Reports",
+        "Marketing Engagement",
+        "3rd party Integrations"
+      ]}
+      imageSrc="/assets/business-dashboard.png"
+      imageAlt="Business Dashboard Interface"
+      cta={{ text: "Book a Demo", link: "#", type: "primary" }}
+    />
+
+    <DetailSection
+      title="The Customer App"
+      description="A user-friendly mobile app for your customers to manage their subscriptions, skip meals, and track deliveries in real-time."
+      features={[
+        "Clean Modern Design",
+        "Easy Subscription Setup",
+        "Flexible Scheduling",
+        "Order Calendar",
+        "Multiple Payment Options",
+        "Referral Program"
+      ]}
+      imageSrc="/assets/customer-app.png"
+      imageAlt="Customer Mobile App"
+      isReversed
+      cta={{ text: "Learn More", link: "#", type: "outline" }}
+    />
+
+    <DetailSection
+      title="The Driver's Field App"
+      description="Efficiently manage last-mile deliveries. Drivers get optimized routes and customers get real-time tracking updates."
+      features={[
+        "Route Optimization",
+        "Real-Time Order Updates",
+        "Multi-lingual Support",
+        "Offline Mode Support",
+        "Proof of Delivery",
+        "Cash Collection Summary"
+      ]}
+      imageSrc="/assets/driver-app.png"
+      imageAlt="Driver Field App"
+      cta={{ text: "Talk to Us!", link: "#", type: "primary" }}
+    />
+
+    <PainPointsSection />
+    <FeaturesSection />
+    <SocialProofSection />
+    <PricingSection onRegister={onRegister} plans={plans} isLoading={isLoadingPlans} />
+    <Footer />
+
+    <CreateTenantDialog
+      open={isRegistrationOpen}
+      onOpenChange={setIsRegistrationOpen}
+    />
+  </main>
+);
+
 // Main App Component
 export default function App() {
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
@@ -923,84 +1009,23 @@ export default function App() {
 
   const openRegistration = () => setIsRegistrationOpen(true);
 
-  const LandingPage = ({ seoProps }: { seoProps?: any }) => (
-    <main className="min-h-screen bg-white scroll-smooth">
-      <SEO {...seoProps} />
-      <Navbar onRegister={openRegistration} />
-      <HeroSection onRegister={openRegistration} />
-
-      <EcosystemSection />
-
-      <DetailSection
-        title="Powerful Business Dashboard"
-        description="The central hub for managing everything from orders to delivery. Get real-time insights into your kitchen's performance."
-        features={[
-          "CRM - Leads & Trials",
-          "Subscription & Order Fulfilment",
-          "Custom delivery rules",
-          "Business Analytics & Reports",
-          "Marketing Engagement",
-          "3rd party Integrations"
-        ]}
-        imageSrc="/assets/business-dashboard.png"
-        imageAlt="Business Dashboard Interface"
-        cta={{ text: "Book a Demo", link: "#", type: "primary" }}
-      />
-
-      <DetailSection
-        title="The Customer App"
-        description="A user-friendly mobile app for your customers to manage their subscriptions, skip meals, and track deliveries in real-time."
-        features={[
-          "Clean Modern Design",
-          "Easy Subscription Setup",
-          "Flexible Scheduling",
-          "Order Calendar",
-          "Multiple Payment Options",
-          "Referral Program"
-        ]}
-        imageSrc="/assets/customer-app.png"
-        imageAlt="Customer Mobile App"
-        isReversed
-        cta={{ text: "Learn More", link: "#", type: "outline" }}
-      />
-
-      <DetailSection
-        title="The Driver's Field App"
-        description="Efficiently manage last-mile deliveries. Drivers get optimized routes and customers get real-time tracking updates."
-        features={[
-          "Route Optimization",
-          "Real-Time Order Updates",
-          "Multi-lingual Support",
-          "Offline Mode Support",
-          "Proof of Delivery",
-          "Cash Collection Summary"
-        ]}
-        imageSrc="/assets/driver-app.png"
-        imageAlt="Driver Field App"
-        cta={{ text: "Talk to Us!", link: "#", type: "primary" }}
-      />
-
-      <PainPointsSection />
-      <FeaturesSection />
-      <SocialProofSection />
-      <PricingSection onRegister={openRegistration} plans={plans} isLoading={isLoadingPlans} />
-      <Footer />
-
-      <CreateTenantDialog
-        open={isRegistrationOpen}
-        onOpenChange={setIsRegistrationOpen}
-      />
-    </main>
-  );
+  const landingPageProps = {
+    plans,
+    isLoadingPlans,
+    onRegister: openRegistration,
+    isRegistrationOpen,
+    setIsRegistrationOpen
+  };
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<LandingPage {...landingPageProps} />} />
         <Route
           path="/features"
           element={
             <LandingPage
+              {...landingPageProps}
               seoProps={{
                 title: "Kitchen Automation Features | UAE SaaS Platform",
                 description: "Streamline your UAE food business with automated order management, sales insights, and supply chain tracking in one B2B SaaS dashboard. Start today."
@@ -1012,6 +1037,7 @@ export default function App() {
           path="/pricing"
           element={
             <LandingPage
+              {...landingPageProps}
               seoProps={{
                 title: "Transparent SaaS Pricing | Kitchen Software UAE",
                 description: "Flexible tiered and usage-based pricing for UAE cloud kitchens. Scale your food brand with no hidden costs and 100% space utilization. See our plans."
@@ -1020,9 +1046,10 @@ export default function App() {
           }
         />
         {/* Fallback for other routes defined in sitemap */}
-        <Route path="/contact" element={<LandingPage />} />
+        <Route path="/contact" element={<LandingPage {...landingPageProps} />} />
       </Routes>
     </Router>
   );
 }
+
 
