@@ -11,6 +11,7 @@ interface NavbarProps {
 export function Navbar({ onRegister, onRegisterWarmup }: NavbarProps) {
     const [isOpen, setIsOpen] = useState(false);
     const location = useLocation();
+    const handleRegisterWarmup = () => onRegisterWarmup?.();
 
     // Smooth scroll for hash links
     useEffect(() => {
@@ -60,6 +61,8 @@ export function Navbar({ onRegister, onRegisterWarmup }: NavbarProps) {
                         <img
                             src="/assets/logo.png"
                             alt="Fun Adventure Kitchen Logo"
+                            loading="eager"
+                            decoding="async"
                             className="w-10 h-10 object-contain"
                         />
                         <span className="text-xl font-bold text-slate-900">
@@ -84,9 +87,9 @@ export function Navbar({ onRegister, onRegisterWarmup }: NavbarProps) {
                         </a>
                         <button
                             onClick={onRegister}
-                            onMouseEnter={onRegisterWarmup}
-                            onFocus={onRegisterWarmup}
-                            onTouchStart={onRegisterWarmup}
+                            onMouseEnter={handleRegisterWarmup}
+                            onFocus={handleRegisterWarmup}
+                            onTouchStart={handleRegisterWarmup}
                             className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-semibold transition-all shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40"
                         >
                             Start Free Trial
@@ -126,9 +129,9 @@ export function Navbar({ onRegister, onRegisterWarmup }: NavbarProps) {
                             Login
                         </a>
                         <button
-                            onMouseEnter={onRegisterWarmup}
-                            onFocus={onRegisterWarmup}
-                            onTouchStart={onRegisterWarmup}
+                            onMouseEnter={handleRegisterWarmup}
+                            onFocus={handleRegisterWarmup}
+                            onTouchStart={handleRegisterWarmup}
                             onClick={() => {
                                 onRegister();
                                 setIsOpen(false);

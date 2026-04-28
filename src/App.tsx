@@ -46,6 +46,8 @@ export interface ServicePlan {
 
 let plansCache: ServicePlan[] | null = null;
 let plansRequest: Promise<ServicePlan[]> | null = null;
+let plansCacheTime: number | null = null;
+const PLANS_CACHE_TTL_MS = 5 * 60 * 1000;
 
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfService'));
@@ -64,7 +66,14 @@ const prefetchCreateTenantDialog = () => {
 };
 
 const fetchServicePlans = async (): Promise<ServicePlan[]> => {
-  if (plansCache) return plansCache;
+  const now = Date.now();
+  if (
+    plansCache &&
+    plansCacheTime &&
+    now - plansCacheTime < PLANS_CACHE_TTL_MS
+  ) {
+    return plansCache;
+  }
   if (plansRequest) return plansRequest;
 
   plansRequest = (async () => {
@@ -72,7 +81,7 @@ const fetchServicePlans = async (): Promise<ServicePlan[]> => {
     const url = `${base.replace(/\/$/, '')}/api/organizations/plans/`;
     const res = await fetch(url);
     if (!res.ok) {
-      return [];
+      return plansCache ?? [];
     }
 
     const data = await res.json();
@@ -82,6 +91,7 @@ const fetchServicePlans = async (): Promise<ServicePlan[]> => {
         ? data.results
         : [];
     plansCache = plansList;
+    plansCacheTime = Date.now();
     return plansList;
   })();
 
@@ -108,7 +118,7 @@ const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1 },
+    transition: { staggerChildren: 0.05 },
   },
 };
 
