@@ -16,7 +16,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { CreateTenantDialog } from './components/CreateTenantDialog';
 import SEO from './components/SEO';
@@ -46,6 +46,38 @@ export interface ServicePlan {
   has_whatsapp_notifications: boolean;
   has_multi_branch: boolean;
 }
+
+let plansCache: ServicePlan[] | null = null;
+let plansRequest: Promise<ServicePlan[]> | null = null;
+
+const fetchServicePlans = async (): Promise<ServicePlan[]> => {
+  if (plansCache) return plansCache;
+  if (plansRequest) return plansRequest;
+
+  plansRequest = (async () => {
+    const base = import.meta.env?.VITE_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api-kitchen.funadventure.ae';
+    const url = `${base.replace(/\/$/, '')}/api/organizations/plans/`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      return [];
+    }
+
+    const data = await res.json();
+    const plansList = Array.isArray(data)
+      ? data
+      : data.results && Array.isArray(data.results)
+        ? data.results
+        : [];
+    plansCache = plansList;
+    return plansList;
+  })();
+
+  try {
+    return await plansRequest;
+  } finally {
+    plansRequest = null;
+  }
+};
 
 // Animation variants
 const fadeInUp = {
@@ -473,6 +505,8 @@ function EcosystemSection() {
           <img
             src="/assets/ecosystem.png"
             alt="Kitchen Ecosystem Flow"
+            loading="lazy"
+            decoding="async"
             className="w-full max-h-[450px] object-contain mx-auto"
           />
         </motion.div>
@@ -555,6 +589,8 @@ function DetailSection({
             <img
               src={imageSrc}
               alt={imageAlt}
+              loading="lazy"
+              decoding="async"
               className="w-full h-auto drop-shadow-2xl rounded-2xl"
             />
           </motion.div>
@@ -605,37 +641,50 @@ const DEFAULT_PLANS: ServicePlan[] = [
   }
 ];
 
+const getPlanFeatures = (plan: ServicePlan) => {
+  const list: string[] = [];
+
+  if (plan.max_customers === 0) list.push('Unlimited customers');
+  else if (plan.max_customers > 0) list.push(`Up to ${plan.max_customers.toLocaleString()} customers`);
+
+  if (plan.has_whatsapp_notifications) list.push('WhatsApp automation');
+  if (plan.has_customer_app) list.push('Dedicated Customer App');
+  if (plan.has_inventory_management) list.push('Inventory management');
+  if (plan.has_delivery_tracking) list.push('Delivery tracking');
+  if (plan.has_analytics) list.push('Advanced analytics');
+  if (plan.has_multi_branch) list.push('Multi-branch support');
+
+  if (list.length < 3) {
+    if (plan.max_menu_items > 0) list.push(`${plan.max_menu_items} menu items`);
+    else if (plan.max_menu_items === 0) list.push('Unlimited menu items');
+
+    if (plan.max_staff_users > 0) list.push(`${plan.max_staff_users} staff users`);
+  }
+
+  if (plan.trial_days > 0) list.push(`${plan.trial_days}-day free trial`);
+
+  return list;
+};
+
 // Pricing Section
 function PricingSection({ onRegister, plans, isLoading }: { onRegister: () => void; plans: ServicePlan[]; isLoading: boolean }) {
-  const displayPlans = plans.length > 0 ? plans : DEFAULT_PLANS;
-
-  const getPlanFeatures = (plan: ServicePlan) => {
-    const list: string[] = [];
-
-    // Usage limits
-    if (plan.max_customers === 0) list.push('Unlimited customers');
-    else if (plan.max_customers > 0) list.push(`Up to ${plan.max_customers.toLocaleString()} customers`);
-
-    // Feature flags
-    if (plan.has_whatsapp_notifications) list.push('WhatsApp automation');
-    if (plan.has_customer_app) list.push('Dedicated Customer App');
-    if (plan.has_inventory_management) list.push('Inventory management');
-    if (plan.has_delivery_tracking) list.push('Delivery tracking');
-    if (plan.has_analytics) list.push('Advanced analytics');
-    if (plan.has_multi_branch) list.push('Multi-branch support');
-
-    // Fallback if no specific features enabled
-    if (list.length < 3) {
-      if (plan.max_menu_items > 0) list.push(`${plan.max_menu_items} menu items`);
-      else if (plan.max_menu_items === 0) list.push('Unlimited menu items');
-
-      if (plan.max_staff_users > 0) list.push(`${plan.max_staff_users} staff users`);
-    }
-
-    if (plan.trial_days > 0) list.push(`${plan.trial_days}-day free trial`);
-
-    return list;
-  };
+  const displayPlans = useMemo(() => (plans.length > 0 ? plans : DEFAULT_PLANS), [plans]);
+  const preparedPlans = useMemo(
+    () =>
+      displayPlans.map((plan) => {
+        const monthlyPrice = parseFloat(plan.price_monthly);
+        return {
+          plan,
+          monthlyPrice,
+          isPopular:
+            plan.tier === 'pro' ||
+            plan.tier === 'professional' ||
+            plan.name.toLowerCase().includes('pro'),
+          features: getPlanFeatures(plan),
+        };
+      }),
+    [displayPlans]
+  );
 
   return (
     <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50">
@@ -668,9 +717,7 @@ function PricingSection({ onRegister, plans, isLoading }: { onRegister: () => vo
           variants={staggerContainer}
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center"
         >
-          {displayPlans.map((plan) => {
-            const isPopular = plan.tier === 'pro' || plan.tier === 'professional' || plan.name.toLowerCase().includes('pro');
-            const features = getPlanFeatures(plan);
+          {preparedPlans.map(({ plan, monthlyPrice, isPopular, features }) => {
 
             return (
               <motion.div
@@ -697,9 +744,9 @@ function PricingSection({ onRegister, plans, isLoading }: { onRegister: () => vo
                     <span
                       className={`text-4xl font-bold ${isPopular ? 'text-white' : 'text-slate-900'}`}
                     >
-                      {parseFloat(plan.price_monthly) === 0 ? 'Free' : `AED ${parseFloat(plan.price_monthly).toLocaleString()}`}
+                      {monthlyPrice === 0 ? 'Free' : `AED ${monthlyPrice.toLocaleString()}`}
                     </span>
-                    {parseFloat(plan.price_monthly) > 0 && (
+                    {monthlyPrice > 0 && (
                       <span
                         className={isPopular ? 'text-indigo-200' : 'text-slate-500'}
                       >
@@ -736,7 +783,7 @@ function PricingSection({ onRegister, plans, isLoading }: { onRegister: () => vo
                     : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/25 hover:scale-[1.02]'
                     }`}
                 >
-                  {parseFloat(plan.price_monthly) === 0 ? 'Start Free' : 'Get Started'}
+                  {monthlyPrice === 0 ? 'Start Free' : 'Get Started'}
                 </button>
               </motion.div>
             );
@@ -749,16 +796,7 @@ function PricingSection({ onRegister, plans, isLoading }: { onRegister: () => vo
 
 // Dynamic Section Components
 
-interface LandingPageProps {
-  seoProps?: any;
-  plans: ServicePlan[];
-  isLoadingPlans: boolean;
-  onRegister: () => void;
-  isRegistrationOpen: boolean;
-  setIsRegistrationOpen: (open: boolean) => void;
-}
-
-const LandingPageContent = ({
+const LandingPageContent = memo(({
   plans,
   isLoadingPlans,
   onRegister,
@@ -821,7 +859,7 @@ const LandingPageContent = ({
     <SocialProofSection />
     <PricingSection onRegister={onRegister} plans={plans} isLoading={isLoadingPlans} />
   </>
-);
+));
 
 
 // Main App Component
@@ -831,35 +869,35 @@ export default function App() {
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
 
   useEffect(() => {
-    const fetchPlans = async () => {
+    const controller = new AbortController();
+    const loadPlans = async () => {
       setIsLoadingPlans(true);
       try {
-        const base = import.meta.env?.VITE_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api-kitchen.funadventure.ae';
-        const url = `${base.replace(/\/$/, '')}/api/organizations/plans/`;
-        const res = await fetch(url);
-        if (res.ok) {
-          const data = await res.json();
-          const plansList = Array.isArray(data) ? data : (data.results && Array.isArray(data.results) ? data.results : []);
+        const plansList = await fetchServicePlans();
+        if (!controller.signal.aborted) {
           setPlans(plansList);
         }
       } catch (err) {
         console.error('Failed to fetch plans:', err);
       } finally {
-        setIsLoadingPlans(false);
+        if (!controller.signal.aborted) {
+          setIsLoadingPlans(false);
+        }
       }
     };
-    fetchPlans();
+    loadPlans();
+    return () => controller.abort();
   }, []);
 
-  const openRegistration = () => setIsRegistrationOpen(true);
-
-  const landingPageProps = {
-    plans,
-    isLoadingPlans,
-    onRegister: openRegistration,
-    isRegistrationOpen,
-    setIsRegistrationOpen
-  };
+  const openRegistration = useCallback(() => setIsRegistrationOpen(true), []);
+  const landingPageProps = useMemo(
+    () => ({
+      plans,
+      isLoadingPlans,
+      onRegister: openRegistration,
+    }),
+    [plans, isLoadingPlans, openRegistration]
+  );
 
   return (
     <Router>
@@ -873,7 +911,7 @@ export default function App() {
               element={
                 <>
                   <SEO />
-                  <LandingPageContent {...landingPageProps} onRegister={openRegistration} />
+                  <LandingPageContent {...landingPageProps} />
                 </>
               }
             />
@@ -885,7 +923,7 @@ export default function App() {
                     title="Kitchen Automation Features | UAE SaaS Platform"
                     description="Streamline your UAE food business with automated order management, sales insights, and supply chain tracking in one B2B SaaS dashboard. Start today."
                   />
-                  <LandingPageContent {...landingPageProps} onRegister={openRegistration} />
+                  <LandingPageContent {...landingPageProps} />
                 </>
               }
             />
@@ -897,7 +935,7 @@ export default function App() {
                     title="Transparent SaaS Pricing | Kitchen Software UAE"
                     description="Flexible tiered and usage-based pricing for UAE cloud kitchens. Scale your food brand with no hidden costs and 100% space utilization. See our plans."
                   />
-                  <LandingPageContent {...landingPageProps} onRegister={openRegistration} />
+                  <LandingPageContent {...landingPageProps} />
                 </>
               }
             />
@@ -906,7 +944,7 @@ export default function App() {
               element={
                 <>
                   <SEO />
-                  <LandingPageContent {...landingPageProps} onRegister={openRegistration} />
+                  <LandingPageContent {...landingPageProps} />
                 </>
               }
             />
@@ -920,6 +958,8 @@ export default function App() {
         <CreateTenantDialog
           open={isRegistrationOpen}
           onOpenChange={setIsRegistrationOpen}
+          plans={plans}
+          isLoadingPlans={isLoadingPlans}
         />
       </div>
     </Router>

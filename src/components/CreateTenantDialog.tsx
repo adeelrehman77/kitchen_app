@@ -54,50 +54,14 @@ const getRegisterUrl = () => {
 interface CreateTenantDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    plans: ServicePlan[];
+    isLoadingPlans: boolean;
 }
 
-export function CreateTenantDialog({ open, onOpenChange }: CreateTenantDialogProps) {
+export function CreateTenantDialog({ open, onOpenChange, plans, isLoadingPlans }: CreateTenantDialogProps) {
     const [isSubmitting, setIsSubmitting] = React.useState(false);
     const [isSuccess, setIsSuccess] = React.useState(false);
     const [apiError, setApiError] = React.useState<string | null>(null);
-    const [plans, setPlans] = React.useState<ServicePlan[]>([]);
-    const [isLoadingPlans, setIsLoadingPlans] = React.useState(false);
-
-    React.useEffect(() => {
-        if (open) {
-            const fetchPlans = async () => {
-                setIsLoadingPlans(true);
-                try {
-                    const base = import.meta.env?.VITE_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api-kitchen.funadventure.ae';
-                    const url = `${base.replace(/\/$/, '')}/api/organizations/plans/`;
-                    console.log('Fetching plans from:', url);
-                    const res = await fetch(url);
-                    console.log('Plans response status:', res.status);
-                    if (res.ok) {
-                        const data = await res.json();
-                        console.log('Plans data received:', data);
-
-                        // Handle both simple array and paginated DRF response
-                        const plansList = Array.isArray(data) ? data : (data.results && Array.isArray(data.results) ? data.results : []);
-
-                        if (plansList.length > 0 || Array.isArray(data)) {
-                            setPlans(plansList);
-                        } else {
-                            console.error('API returned unexpected format for plans:', data);
-                        }
-                    } else {
-                        const errorText = await res.text();
-                        console.error('Plans fetch failed:', errorText);
-                    }
-                } catch (err) {
-                    console.error('Failed to fetch plans:', err);
-                } finally {
-                    setIsLoadingPlans(false);
-                }
-            };
-            fetchPlans();
-        }
-    }, [open]);
 
     const {
         register,
