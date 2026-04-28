@@ -16,14 +16,11 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-import { useState, useEffect, useMemo, useCallback, memo } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo, lazy, Suspense } from 'react';
 import { cn } from '@/lib/utils';
-import { CreateTenantDialog } from './components/CreateTenantDialog';
 import SEO from './components/SEO';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsOfService from './pages/TermsOfService';
 
 
 
@@ -49,6 +46,14 @@ export interface ServicePlan {
 
 let plansCache: ServicePlan[] | null = null;
 let plansRequest: Promise<ServicePlan[]> | null = null;
+
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicy'));
+const TermsOfServicePage = lazy(() => import('./pages/TermsOfService'));
+const CreateTenantDialog = lazy(() =>
+  import('./components/CreateTenantDialog').then((module) => ({
+    default: module.CreateTenantDialog,
+  }))
+);
 
 const fetchServicePlans = async (): Promise<ServicePlan[]> => {
   if (plansCache) return plansCache;
@@ -78,6 +83,12 @@ const fetchServicePlans = async (): Promise<ServicePlan[]> => {
     plansRequest = null;
   }
 };
+
+const RouteFallback = () => (
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-slate-500">
+    Loading...
+  </div>
+);
 
 // Animation variants
 const fadeInUp = {
@@ -865,6 +876,7 @@ const LandingPageContent = memo(({
 // Main App Component
 export default function App() {
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+  const [hasLoadedDialog, setHasLoadedDialog] = useState(false);
   const [plans, setPlans] = useState<ServicePlan[]>([]);
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
 
@@ -890,6 +902,12 @@ export default function App() {
   }, []);
 
   const openRegistration = useCallback(() => setIsRegistrationOpen(true), []);
+  useEffect(() => {
+    if (isRegistrationOpen) {
+      setHasLoadedDialog(true);
+    }
+  }, [isRegistrationOpen]);
+
   const landingPageProps = useMemo(
     () => ({
       plans,
@@ -948,19 +966,37 @@ export default function App() {
                 </>
               }
             />
-            <Route path="/privacy" element={<PrivacyPolicy onRegister={openRegistration} />} />
-            <Route path="/terms" element={<TermsOfService onRegister={openRegistration} />} />
+            <Route
+              path="/privacy"
+              element={
+                <Suspense fallback={<RouteFallback />}>
+                  <PrivacyPolicyPage onRegister={openRegistration} />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/terms"
+              element={
+                <Suspense fallback={<RouteFallback />}>
+                  <TermsOfServicePage onRegister={openRegistration} />
+                </Suspense>
+              }
+            />
           </Routes>
         </main>
 
         <Footer />
 
-        <CreateTenantDialog
-          open={isRegistrationOpen}
-          onOpenChange={setIsRegistrationOpen}
-          plans={plans}
-          isLoadingPlans={isLoadingPlans}
-        />
+        {hasLoadedDialog && (
+          <Suspense fallback={null}>
+            <CreateTenantDialog
+              open={isRegistrationOpen}
+              onOpenChange={setIsRegistrationOpen}
+              plans={plans}
+              isLoadingPlans={isLoadingPlans}
+            />
+          </Suspense>
+        )}
       </div>
     </Router>
   );
