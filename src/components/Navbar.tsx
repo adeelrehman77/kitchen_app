@@ -5,9 +5,10 @@ import { Link, useLocation } from 'react-router-dom';
 
 interface NavbarProps {
     onRegister: () => void;
+    onRegisterWarmup?: () => void;
 }
 
-export function Navbar({ onRegister }: NavbarProps) {
+export function Navbar({ onRegister, onRegisterWarmup }: NavbarProps) {
     const [isOpen, setIsOpen] = useState(false);
     const location = useLocation();
 
@@ -83,6 +84,9 @@ export function Navbar({ onRegister }: NavbarProps) {
                         </a>
                         <button
                             onClick={onRegister}
+                            onMouseEnter={onRegisterWarmup}
+                            onFocus={onRegisterWarmup}
+                            onTouchStart={onRegisterWarmup}
                             className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-semibold transition-all shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40"
                         >
                             Start Free Trial
@@ -122,6 +126,9 @@ export function Navbar({ onRegister }: NavbarProps) {
                             Login
                         </a>
                         <button
+                            onMouseEnter={onRegisterWarmup}
+                            onFocus={onRegisterWarmup}
+                            onTouchStart={onRegisterWarmup}
                             onClick={() => {
                                 onRegister();
                                 setIsOpen(false);

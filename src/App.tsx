@@ -54,6 +54,14 @@ const CreateTenantDialog = lazy(() =>
     default: module.CreateTenantDialog,
   }))
 );
+let createTenantDialogPrefetch: Promise<unknown> | null = null;
+
+const prefetchCreateTenantDialog = () => {
+  if (!createTenantDialogPrefetch) {
+    createTenantDialogPrefetch = import('./components/CreateTenantDialog');
+  }
+  return createTenantDialogPrefetch;
+};
 
 const fetchServicePlans = async (): Promise<ServicePlan[]> => {
   if (plansCache) return plansCache;
@@ -105,7 +113,13 @@ const staggerContainer = {
 };
 
 // Hero Section
-function HeroSection({ onRegister }: { onRegister: () => void }) {
+function HeroSection({
+  onRegister,
+  onRegisterWarmup,
+}: {
+  onRegister: () => void;
+  onRegisterWarmup?: () => void;
+}) {
   return (
     <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-white to-indigo-50">
       <div className="max-w-7xl mx-auto">
@@ -150,6 +164,9 @@ function HeroSection({ onRegister }: { onRegister: () => void }) {
             >
               <button
                 onClick={onRegister}
+                onMouseEnter={onRegisterWarmup}
+                onFocus={onRegisterWarmup}
+                onTouchStart={onRegisterWarmup}
                 className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all shadow-xl shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:scale-105"
               >
                 Get Started for Free
@@ -678,7 +695,17 @@ const getPlanFeatures = (plan: ServicePlan) => {
 };
 
 // Pricing Section
-function PricingSection({ onRegister, plans, isLoading }: { onRegister: () => void; plans: ServicePlan[]; isLoading: boolean }) {
+function PricingSection({
+  onRegister,
+  onRegisterWarmup,
+  plans,
+  isLoading,
+}: {
+  onRegister: () => void;
+  onRegisterWarmup?: () => void;
+  plans: ServicePlan[];
+  isLoading: boolean;
+}) {
   const displayPlans = useMemo(() => (plans.length > 0 ? plans : DEFAULT_PLANS), [plans]);
   const preparedPlans = useMemo(
     () =>
@@ -789,6 +816,9 @@ function PricingSection({ onRegister, plans, isLoading }: { onRegister: () => vo
 
                 <button
                   onClick={onRegister}
+                  onMouseEnter={onRegisterWarmup}
+                  onFocus={onRegisterWarmup}
+                  onTouchStart={onRegisterWarmup}
                   className={`block w-full py-4 px-6 rounded-xl font-bold text-center transition-all duration-300 ${isPopular
                     ? 'bg-white text-indigo-600 hover:bg-indigo-50 shadow-lg hover:scale-[1.02]'
                     : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/25 hover:scale-[1.02]'
@@ -811,13 +841,15 @@ const LandingPageContent = memo(({
   plans,
   isLoadingPlans,
   onRegister,
+  onRegisterWarmup,
 }: {
   plans: ServicePlan[];
   isLoadingPlans: boolean;
   onRegister: () => void;
+  onRegisterWarmup?: () => void;
 }) => (
   <>
-    <HeroSection onRegister={onRegister} />
+    <HeroSection onRegister={onRegister} onRegisterWarmup={onRegisterWarmup} />
     <EcosystemSection />
     <DetailSection
       title="Powerful Business Dashboard"
@@ -868,7 +900,12 @@ const LandingPageContent = memo(({
     <PainPointsSection />
     <FeaturesSection />
     <SocialProofSection />
-    <PricingSection onRegister={onRegister} plans={plans} isLoading={isLoadingPlans} />
+    <PricingSection
+      onRegister={onRegister}
+      onRegisterWarmup={onRegisterWarmup}
+      plans={plans}
+      isLoading={isLoadingPlans}
+    />
   </>
 ));
 
@@ -901,26 +938,29 @@ export default function App() {
     return () => controller.abort();
   }, []);
 
-  const openRegistration = useCallback(() => setIsRegistrationOpen(true), []);
-  useEffect(() => {
-    if (isRegistrationOpen) {
-      setHasLoadedDialog(true);
-    }
-  }, [isRegistrationOpen]);
+  const warmupRegistration = useCallback(() => {
+    setHasLoadedDialog(true);
+    void prefetchCreateTenantDialog();
+  }, []);
+  const openRegistration = useCallback(() => {
+    warmupRegistration();
+    setIsRegistrationOpen(true);
+  }, [warmupRegistration]);
 
   const landingPageProps = useMemo(
     () => ({
       plans,
       isLoadingPlans,
       onRegister: openRegistration,
+      onRegisterWarmup: warmupRegistration,
     }),
-    [plans, isLoadingPlans, openRegistration]
+    [plans, isLoadingPlans, openRegistration, warmupRegistration]
   );
 
   return (
     <Router>
       <div className="min-h-screen bg-white flex flex-col">
-        <Navbar onRegister={openRegistration} />
+        <Navbar onRegister={openRegistration} onRegisterWarmup={warmupRegistration} />
 
         <main className="flex-grow scroll-smooth">
           <Routes>
