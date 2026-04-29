@@ -1,4 +1,4 @@
-import { LazyMotion, domAnimation, m } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import {
@@ -21,8 +21,6 @@ import { cn } from '@/lib/utils';
 import SEO from './components/SEO';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
-
-const motion = m;
 
 
 export interface ServicePlan {
@@ -580,13 +578,13 @@ function DetailSection({
   cta
 }: FeatureSectionProps) {
   const optimizedImageMap: Record<string, string> = {
-    '/assets/business-dashboard.png': '/assets/business-dashboard-550.jpg',
-    '/assets/customer-app.png': '/assets/customer-app-550.jpg',
-    '/assets/driver-app.png': '/assets/driver-app-550.jpg',
+    '/assets/business-dashboard.png': '/assets/business-dashboard-512.jpg',
+    '/assets/customer-app.png': '/assets/customer-app-512.jpg',
+    '/assets/driver-app.png': '/assets/driver-app-512.jpg',
   };
   const optimizedImageSrc = optimizedImageMap[imageSrc];
   const detailImageSrcSet = optimizedImageSrc
-    ? `${optimizedImageSrc} 550w, ${imageSrc} 640w`
+    ? `${optimizedImageSrc} 512w, ${imageSrc} 640w`
     : undefined;
 
   return (
@@ -647,7 +645,7 @@ function DetailSection({
               decoding="async"
               fetchPriority="low"
               srcSet={detailImageSrcSet}
-              sizes="(max-width: 1024px) 92vw, 550px"
+              sizes="(max-width: 1024px) 90vw, 506px"
               width={640}
               height={640}
               className="w-full h-auto drop-shadow-2xl rounded-2xl"
@@ -989,13 +987,12 @@ export default function App() {
   );
 
   return (
-    <LazyMotion features={domAnimation}>
-      <Router>
-        <div className="min-h-screen bg-white flex flex-col">
-          <Navbar onRegister={openRegistration} onRegisterWarmup={warmupRegistration} />
+    <Router>
+      <div className="min-h-screen bg-white flex flex-col">
+        <Navbar onRegister={openRegistration} onRegisterWarmup={warmupRegistration} />
 
-          <main className="flex-grow scroll-smooth">
-            <Routes>
+        <main className="flex-grow scroll-smooth">
+          <Routes>
             <Route
               path="/"
               element={
@@ -1054,24 +1051,23 @@ export default function App() {
                 </Suspense>
               }
             />
-            </Routes>
-          </main>
+          </Routes>
+        </main>
 
-          <Footer />
+        <Footer />
 
-          {hasLoadedDialog && (
-            <Suspense fallback={null}>
-              <CreateTenantDialog
-                open={isRegistrationOpen}
-                onOpenChange={setIsRegistrationOpen}
-                plans={plans}
-                isLoadingPlans={isLoadingPlans}
-              />
-            </Suspense>
-          )}
-        </div>
-      </Router>
-    </LazyMotion>
+        {hasLoadedDialog && (
+          <Suspense fallback={null}>
+            <CreateTenantDialog
+              open={isRegistrationOpen}
+              onOpenChange={setIsRegistrationOpen}
+              plans={plans}
+              isLoadingPlans={isLoadingPlans}
+            />
+          </Suspense>
+        )}
+      </div>
+    </Router>
   );
 }
 
