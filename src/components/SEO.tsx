@@ -10,8 +10,8 @@ interface SEOProps {
 }
 
 const SEO = ({
-    title = "Smart Kitchen Management SaaS | Subscription App for UAE & India",
-    description = "Automate your meal prep service. Track subscriptions, payments, and kitchen orders in real-time. Designed for providers in Dubai and India.",
+    title = "Smart Kitchen Management & Subscription SaaS | UAE & India",
+    description = "Automate your meal prep business. Track tiffin subscriptions, manage kitchen orders, and send payment reminders. Get started for free.",
     keywords = "smart kitchen management saas, subscription app UAE India, tiffin management software, meal prep subscription app",
     ogTitle,
     ogDescription,
