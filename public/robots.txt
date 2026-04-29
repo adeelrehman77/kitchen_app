@@ -1,5 +1,4 @@
 User-agent: *
-Allow: /
 Disallow: /admin/
 Disallow: /api/v1/internal/
 Disallow: /static/admin/
