@@ -545,6 +545,11 @@ function EcosystemSection() {
             alt="Kitchen Ecosystem Flow"
             loading="lazy"
             decoding="async"
+            fetchPriority="low"
+            srcSet="/assets/ecosystem-450.jpg 450w, /assets/ecosystem.png 640w"
+            sizes="(max-width: 768px) 90vw, 450px"
+            width={640}
+            height={640}
             className="w-full max-h-[450px] object-contain mx-auto"
           />
         </motion.div>
@@ -573,6 +578,16 @@ function DetailSection({
   isReversed,
   cta
 }: FeatureSectionProps) {
+  const optimizedImageMap: Record<string, string> = {
+    '/assets/business-dashboard.png': '/assets/business-dashboard-512.jpg',
+    '/assets/customer-app.png': '/assets/customer-app-512.jpg',
+    '/assets/driver-app.png': '/assets/driver-app-512.jpg',
+  };
+  const optimizedImageSrc = optimizedImageMap[imageSrc];
+  const detailImageSrcSet = optimizedImageSrc
+    ? `${optimizedImageSrc} 512w, ${imageSrc} 640w`
+    : undefined;
+
   return (
     <section className="py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
       <div className="max-w-7xl mx-auto">
@@ -629,6 +644,11 @@ function DetailSection({
               alt={imageAlt}
               loading="lazy"
               decoding="async"
+              fetchPriority="low"
+              srcSet={detailImageSrcSet}
+              sizes="(max-width: 1024px) 90vw, 506px"
+              width={640}
+              height={640}
               className="w-full h-auto drop-shadow-2xl rounded-2xl"
             />
           </motion.div>

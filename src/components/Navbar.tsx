@@ -63,6 +63,8 @@ export function Navbar({ onRegister, onRegisterWarmup }: NavbarProps) {
                             alt="Fun Adventure Kitchen Logo"
                             loading="eager"
                             decoding="async"
+                            width={40}
+                            height={40}
                             className="w-10 h-10 object-contain"
                         />
                         <span className="text-xl font-bold text-slate-900">

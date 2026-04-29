@@ -1,29 +1,14 @@
-# BEGIN Cloudflare Managed content + UAE SaaS Optimization
-
 User-agent: *
-Content-Signal: search=yes,ai-train=no
-# Cloudflare Rule
 Allow: /
-# Your B2B SaaS Landing Pages
-Allow: /about
-Allow: /features
-Allow: /pricing
-Allow: /contact
-
-# Block sensitive system and tenant-specific paths
 Disallow: /admin/
 Disallow: /api/v1/internal/
 Disallow: /static/admin/
 Disallow: /media/private/
 Disallow: /config/
-Disallow: /*/settings/
-
-# Block crawlers from getting stuck in search filters or login redirects
 Disallow: /login
 Disallow: /register
-Disallow: /search?q=
+Disallow: /search
 
-# AI & Bot Specific blocks
 User-agent: Amazonbot
 Disallow: /
 
@@ -39,16 +24,10 @@ Disallow: /
 User-agent: ClaudeBot
 Disallow: /
 
-User-agent: Google-Extended
-Disallow: /
-
 User-agent: GPTBot
 Disallow: /
 
 User-agent: meta-externalagent
 Disallow: /
 
-# END Cloudflare Managed Content
-
-# Point to your sitemap to help Google index UAE-wide content
 Sitemap: https://kitchen.funadventure.ae/sitemap.xml
