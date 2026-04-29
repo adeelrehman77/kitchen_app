@@ -420,7 +420,7 @@ function FeaturesSection() {
             variants={fadeInUp}
             className="text-3xl sm:text-4xl font-bold text-white mb-4"
           >
-            Everything You Need to Run Your Kitchen
+            Tiffin Management Software: Everything You Need to Run Your Kitchen
           </motion.h2>
           <motion.p
             variants={fadeInUp}
@@ -484,7 +484,7 @@ function SocialProofSection() {
           <span className="text-indigo-200 font-medium">Trusted Platform</span>
         </div>
         <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-          Trusted by Kitchens in Sharjah and Dubai
+          Meal Prep Subscription App Trusted by Kitchens in Sharjah and Dubai
         </h3>
         <p className="text-indigo-100 text-lg">
           Join growing meal prep businesses that have automated their operations

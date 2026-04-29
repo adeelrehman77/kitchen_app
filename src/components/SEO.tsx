@@ -10,9 +10,9 @@ interface SEOProps {
 }
 
 const SEO = ({
-    title = "Kitchen Management Software UAE | Multi-Tenant Platform",
-    description = "The leading cloud kitchen SaaS subscription in the UAE. Manage tenants, delivery, and operations with our multi-tenant food business platform in the UAE.",
-    keywords = "kitchen management software UAE, cloud kitchen SaaS UAE, delivery management system",
+    title = "Smart Kitchen Management SaaS | Subscription App for UAE & India",
+    description = "Automate your meal prep service. Track subscriptions, payments, and kitchen orders in real-time. Designed for providers in Dubai and India.",
+    keywords = "smart kitchen management saas, subscription app UAE India, tiffin management software, meal prep subscription app",
     ogTitle,
     ogDescription,
     ogImage = "https://kitchen.funadventure.ae/assets/og-image.jpg"
